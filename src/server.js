@@ -14,6 +14,9 @@ app.use(express.json());
 app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 7000;
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "UP", message: "User Service is running 🚀" });
+});
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
