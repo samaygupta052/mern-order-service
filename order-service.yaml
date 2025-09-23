@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: samaygupta018/order-service:1.0
+          ports:
+            - containerPort: 7000
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: order-service-config
+                  key: PORT
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: order-service-config
+                  key: SERVICE_NAME
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: order-service-secret
+                  key: mongo-uri
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - protocol: TCP
+      port: 7000
+      targetPort: 7000
+  type: ClusterIP
